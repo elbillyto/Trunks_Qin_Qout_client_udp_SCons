@@ -1,5 +1,6 @@
 import os # 
 import re # 
+import fnmatch
 
 # This is a comment
 env = Environment()   # Create an environmnet
@@ -26,11 +27,26 @@ env.Append(LIBS = ['pthread'])
 
 #sources
 sources= []
-sources += [each for each in os.listdir("./src") if each.endswith('.c')]
+def find_files(directory, pattern):
+    for root, dirs, files in os.walk(directory):
+        for basename in files:
+            if fnmatch.fnmatch(basename, pattern):
+                filename = os.path.join(root, basename)
+                yield filename
+
+
+for filename in find_files('src', '*.c'):
+	print 'Found C source:', filename	
+	sources.append(filename)
+
+#sources= []	
+#sources += [each for each in os.listdir("./src") if each.endswith('.c')]
+
 print sources
 
+print 'muestro sources_list'
 sources_list = env.Object(source = sources)
 print sources_list
 
 #Build the program
-env.Program(target = "Trunks_Qin_Qout.exe", source = sources_list)
+env.Program(target = "Trunks_Qin_Qout.exe", source = sources)
